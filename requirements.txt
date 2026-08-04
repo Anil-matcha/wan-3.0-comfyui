@@ -1,0 +1,6 @@
+requests>=2.31.0
+Pillow>=9.0.0
+numpy>=1.23.0
+opencv-python>=4.7.0
+# ComfyUI normally provides the installed PyTorch runtime used by IMAGE tensors.
+torch>=2.0.0

@@ -1,0 +1,69 @@
+{
+  "last_node_id": 4,
+  "last_link_id": 4,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "Wan30ApiKey",
+      "pos": [40, 180],
+      "size": {"0": 300, "1": 80},
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [{"name": "api_key", "type": "STRING", "links": [1], "slot_index": 0}],
+      "properties": {"Node name for S&R": "Wan30ApiKey"},
+      "widgets_values": [""]
+    },
+    {
+      "id": 2,
+      "type": "Wan30TextToImage",
+      "pos": [420, 80],
+      "size": {"0": 430, "1": 240},
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [{"name": "api_key", "type": "STRING", "link": 1, "slot_index": 0}],
+      "outputs": [
+        {"name": "image", "type": "IMAGE", "links": [2, 3], "slot_index": 0},
+        {"name": "image_url", "type": "STRING", "links": [4], "slot_index": 1},
+        {"name": "request_id", "type": "STRING", "links": null, "slot_index": 2}
+      ],
+      "properties": {"Node name for S&R": "Wan30TextToImage"},
+      "widgets_values": ["An editorial product photograph of a glass perfume bottle on blue silk, soft studio lighting"]
+    },
+    {
+      "id": 3,
+      "type": "Wan30ImageSaver",
+      "pos": [930, 80],
+      "size": {"0": 360, "1": 170},
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [{"name": "image_url", "type": "STRING", "link": 4, "slot_index": 0}],
+      "outputs": [{"name": "image", "type": "IMAGE", "links": null, "slot_index": 0}],
+      "properties": {"Node name for S&R": "Wan30ImageSaver"},
+      "widgets_values": ["wan_3_0_t2i", "wan_3_0_t2i"]
+    },
+    {
+      "id": 4,
+      "type": "PreviewImage",
+      "pos": [420, 390],
+      "size": {"0": 360, "1": 270},
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [{"name": "images", "type": "IMAGE", "link": 2, "slot_index": 0}],
+      "properties": {"Node name for S&R": "PreviewImage"}
+    }
+  ],
+  "links": [
+    [1, 1, 0, 2, 0, "STRING"],
+    [2, 2, 0, 4, 0, "IMAGE"],
+    [3, 2, 0, 3, 0, "IMAGE"],
+    [4, 2, 1, 3, 0, "STRING"]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {"ds": {"scale": 0.75, "offset": [0, 0]}},
+  "version": 0.4
+}
