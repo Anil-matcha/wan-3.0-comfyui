@@ -4,6 +4,15 @@ ComfyUI custom nodes for the [Wan 3.0 API](https://muapi.ai/wan-3), delivered th
 
 The pack follows the focused Muapi workflow pattern: add one API Key node, connect it to a Wan 3.0 generation node, then preview the returned `IMAGE` output or save the returned media URL into `ComfyUI/output`.
 
+## Related Projects
+
+- [Wan-3.0-API](https://github.com/Anil-matcha/Wan-3.0-API) — Python SDK and MCP server for Wan 3.0-compatible video workflows.
+- [Open-Generative-AI](https://github.com/Anil-matcha/Open-Generative-AI) — Open-source media studio that uses MuAPI for image and video workflows.
+- [muapi-comfyui](https://github.com/SamurAIGPT/muapi-comfyui) — General MuAPI ComfyUI node pack.
+- [seedance2-comfyui](https://github.com/Anil-matcha/seedance2-comfyui) — Seedance 2 custom nodes and workflows for ComfyUI.
+- [seedance2.5-comfyui](https://github.com/Anil-matcha/seedance2.5-comfyui) — Native Seedance 2.5 custom nodes and workflows for ComfyUI.
+- [veo3.1-comfyui](https://github.com/Anil-matcha/veo3.1-comfyui) — Veo 3.1 custom nodes and workflows for ComfyUI.
+
 ## Included nodes
 
 | Node | What it does |
