@@ -4,6 +4,9 @@ ComfyUI custom nodes for the [Wan 3.0 API](https://muapi.ai/wan-3), delivered th
 
 The pack follows the focused Muapi workflow pattern: add one API Key node, connect it to a Wan 3.0 generation node, then preview the returned `IMAGE` output or save the returned media URL into `ComfyUI/output`.
 
+<p align="center"><a href="https://youtu.be/T4Oddw74O44"><img src="https://i.ytimg.com/vi/T4Oddw74O44/maxresdefault.jpg" width="720"></a></p>
+<p align="center"><a href="https://youtu.be/pq0B_A0K770"><b>▶ Watch: How to Access Wan 3.0 API - Best Uncensored Alternative to Seedance 2 </b></a></p>
+
 ## Related Projects
 
 - [Wan-3.0-API](https://github.com/Anil-matcha/Wan-3.0-API) — Python SDK and MCP server for Wan 3.0-compatible video workflows.
