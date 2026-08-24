@@ -18,10 +18,20 @@ else:
     from wan_3_nodes import (
         Wan30ImageEdit,
         Wan30ImageToVideo,
+        Wan30ReferenceToVideo,
         Wan30TextToImage,
         Wan30TextToVideo,
         _output_value,
     )
+
+    _DEFAULT_VIDEO_PARAMS = {
+        "resolution": "720p",
+        "aspect_ratio": "16:9",
+        "duration": 5,
+        "thinking_mode": False,
+        "enable_audio": True,
+        "seed": -1,
+    }
 
     _IMAGE = torch.zeros(1, 2, 2, 3)
     _OUTPUT_IMAGE = torch.zeros(1, 2, 2, 3)
@@ -80,7 +90,10 @@ else:
 
             self.assertEqual(result[0], "https://video.test/t2v.mp4")
             self.assertEqual(submit.call_args.args[1], "wan3.0-text-to-video")
-            self.assertEqual(submit.call_args.args[2], {"prompt": "A cinematic sunrise"})
+            self.assertEqual(
+                submit.call_args.args[2],
+                {"prompt": "A cinematic sunrise", **_DEFAULT_VIDEO_PARAMS},
+            )
 
         @patch("wan_3_nodes._upload_image", return_value="https://image.test/start.png")
         @patch("wan_3_nodes._first_frame", return_value=_OUTPUT_FRAME)
@@ -100,8 +113,35 @@ else:
                 {
                     "prompt": "The camera slowly pushes in",
                     "image_url": "https://image.test/start.png",
+                    **_DEFAULT_VIDEO_PARAMS,
                 },
             )
+
+        @patch("wan_3_nodes._first_frame", return_value=_OUTPUT_FRAME)
+        @patch("wan_3_nodes._poll", return_value={"outputs": ["https://video.test/r2v.mp4"]})
+        @patch("wan_3_nodes._submit", return_value="r2v-request")
+        def test_reference_to_video_sends_reference_lists(self, submit, _poll, _frame):
+            Wan30ReferenceToVideo().run(
+                "The person from the reference image walks into the room",
+                api_key="test-key",
+                reference_images="https://image.test/a.jpg, https://image.test/b.jpg",
+                reference_videos="https://video.test/room.mp4",
+            )
+
+            self.assertEqual(submit.call_args.args[1], "wan3.0-reference-to-video")
+            self.assertEqual(
+                submit.call_args.args[2],
+                {
+                    "prompt": "The person from the reference image walks into the room",
+                    "images_list": ["https://image.test/a.jpg", "https://image.test/b.jpg"],
+                    "videos_list": ["https://video.test/room.mp4"],
+                    **_DEFAULT_VIDEO_PARAMS,
+                },
+            )
+
+        def test_reference_to_video_requires_at_least_one_reference(self):
+            with self.assertRaises(ValueError):
+                Wan30ReferenceToVideo().run("A prompt with no references", api_key="test-key")
 
 
 if __name__ == "__main__":

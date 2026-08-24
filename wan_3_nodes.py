@@ -1,12 +1,16 @@
 """ComfyUI nodes for the Wan 3.0 API through Muapi.
 
-The pack mirrors the four Wan 3.0 model contracts currently published by
-Muapi:
+The pack covers the Wan 3.0 model contracts published by Muapi:
 
-* text-to-image from a prompt;
-* instruction-based image editing from a prompt and source image;
-* text-to-video from a prompt; and
-* image-to-video from a prompt and source image.
+* text-to-video from a prompt, with synchronized audio, thinking mode,
+  selectable resolution/aspect ratio/duration, and a seed (live);
+* image-to-video from a prompt and source image, with the same controls
+  plus an optional end-frame (``last_image``) (live);
+* reference-to-video from a prompt plus up to 10 reference images, 5
+  reference videos, and 5 reference audios (live); and
+* text-to-image and instruction-based image editing from a prompt
+  (coming soon — the endpoints are registered but not yet live; requests
+  will fail until Muapi ships them).
 
 Each request uses Muapi's submit-then-poll API pattern and returns media in a
 form that can be previewed or passed to one of the included saver nodes. The
@@ -371,6 +375,36 @@ def _image_source_inputs():
     }
 
 
+def _video_params_inputs(max_duration: int = 30):
+    return {
+        "resolution": (["480p", "720p", "1080p"], {"default": "720p"}),
+        "aspect_ratio": (["16:9", "9:16", "1:1", "4:3", "3:4"], {"default": "16:9"}),
+        "duration": ("INT", {"default": 5, "min": 2, "max": max_duration, "step": 1}),
+        "thinking_mode": ("BOOLEAN", {"default": False}),
+        "enable_audio": ("BOOLEAN", {"default": True}),
+        "seed": ("INT", {"default": -1, "min": -1, "max": 2**31 - 1}),
+    }
+
+
+def _video_params_payload(resolution="720p", aspect_ratio="16:9", duration=5,
+                           thinking_mode=False, enable_audio=True, seed=-1):
+    return {
+        "resolution": resolution,
+        "aspect_ratio": aspect_ratio,
+        "duration": int(duration),
+        "thinking_mode": bool(thinking_mode),
+        "enable_audio": bool(enable_audio),
+        "seed": int(seed),
+    }
+
+
+def _split_url_list(value: str, limit: int):
+    if not value or not str(value).strip():
+        return []
+    urls = [line.strip() for line in str(value).replace(",", "\n").splitlines() if line.strip()]
+    return urls[:limit]
+
+
 class _Wan30GenerationNode:
     endpoint = ""
     label = "Wan 3.0"
@@ -487,7 +521,10 @@ class Wan30TextToVideo(_Wan30GenerationNode):
                     "A cinematic aerial shot of mist moving through a mountain valley at sunrise"
                 )
             },
-            "optional": {"api_key": ("STRING", {"multiline": False, "default": ""})},
+            "optional": {
+                "api_key": ("STRING", {"multiline": False, "default": ""}),
+                **_video_params_inputs(),
+            },
         }
 
     RETURN_TYPES = ("STRING", "IMAGE", "STRING")
@@ -495,11 +532,15 @@ class Wan30TextToVideo(_Wan30GenerationNode):
     FUNCTION = "run"
     CATEGORY = "🌀 Wan 3.0"
 
-    def run(self, prompt, api_key=""):
+    def run(self, prompt, api_key="", resolution="720p", aspect_ratio="16:9",
+            duration=5, thinking_mode=False, enable_audio=True, seed=-1):
         prompt = str(prompt or "").strip()
         if not prompt:
             raise ValueError("prompt cannot be empty.")
-        return self._complete(_load_api_key(api_key), {"prompt": prompt})
+        payload = {"prompt": prompt, **_video_params_payload(
+            resolution, aspect_ratio, duration, thinking_mode, enable_audio, seed
+        )}
+        return self._complete(_load_api_key(api_key), payload)
 
 
 class Wan30ImageToVideo(_Wan30GenerationNode):
@@ -515,7 +556,18 @@ class Wan30ImageToVideo(_Wan30GenerationNode):
                     "The camera slowly pushes in as a breeze moves through the subject's hair"
                 )
             },
-            "optional": _image_source_inputs(),
+            "optional": {
+                **_image_source_inputs(),
+                "last_image_url": (
+                    "STRING",
+                    {
+                        "multiline": False,
+                        "default": "",
+                        "tooltip": "Optional end-frame image (remote URL or local path) to guide how the video ends.",
+                    },
+                ),
+                **_video_params_inputs(),
+            },
         }
 
     RETURN_TYPES = ("STRING", "IMAGE", "STRING")
@@ -523,7 +575,9 @@ class Wan30ImageToVideo(_Wan30GenerationNode):
     FUNCTION = "run"
     CATEGORY = "🌀 Wan 3.0"
 
-    def run(self, prompt, api_key="", image=None, image_url=""):
+    def run(self, prompt, api_key="", image=None, image_url="", last_image_url="",
+            resolution="720p", aspect_ratio="16:9", duration=5, thinking_mode=False,
+            enable_audio=True, seed=-1):
         prompt = str(prompt or "").strip()
         if not prompt:
             raise ValueError("prompt cannot be empty.")
@@ -531,10 +585,87 @@ class Wan30ImageToVideo(_Wan30GenerationNode):
         source_url = _upload_image(key, image) if image is not None else _resolve_image_ref(key, image_url)
         if not source_url:
             raise ValueError("Connect an IMAGE or provide image_url to the Wan 3.0 Image-to-Video node.")
-        return self._complete(
-            key,
-            {"prompt": prompt, "image_url": source_url},
-        )
+        payload = {"prompt": prompt, "image_url": source_url, **_video_params_payload(
+            resolution, aspect_ratio, duration, thinking_mode, enable_audio, seed
+        )}
+        last_image = _resolve_image_ref(key, last_image_url)
+        if last_image:
+            payload["last_image"] = last_image
+        return self._complete(key, payload)
+
+
+class Wan30ReferenceToVideo(_Wan30GenerationNode):
+    endpoint = "wan3.0-reference-to-video"
+    label = "Wan 3.0 R2V"
+    media_kind = "video"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "prompt": _prompt_input(
+                    "The person from the reference image walks into the room shown in the reference video"
+                )
+            },
+            "optional": {
+                "api_key": ("STRING", {"multiline": False, "default": ""}),
+                "reference_images": (
+                    "STRING",
+                    {
+                        "multiline": True,
+                        "default": "",
+                        "tooltip": "Up to 10 reference image URLs, one per line (or comma-separated).",
+                    },
+                ),
+                "reference_videos": (
+                    "STRING",
+                    {
+                        "multiline": True,
+                        "default": "",
+                        "tooltip": "Up to 5 reference video URLs, one per line (or comma-separated).",
+                    },
+                ),
+                "reference_audios": (
+                    "STRING",
+                    {
+                        "multiline": True,
+                        "default": "",
+                        "tooltip": "Up to 5 reference audio URLs, one per line (or comma-separated).",
+                    },
+                ),
+                **_video_params_inputs(),
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "IMAGE", "STRING")
+    RETURN_NAMES = ("video_url", "first_frame", "request_id")
+    FUNCTION = "run"
+    CATEGORY = "🌀 Wan 3.0"
+
+    def run(self, prompt, api_key="", reference_images="", reference_videos="",
+            reference_audios="", resolution="720p", aspect_ratio="16:9", duration=5,
+            thinking_mode=False, enable_audio=True, seed=-1):
+        prompt = str(prompt or "").strip()
+        if not prompt:
+            raise ValueError("prompt cannot be empty.")
+        payload = {"prompt": prompt, **_video_params_payload(
+            resolution, aspect_ratio, duration, thinking_mode, enable_audio, seed
+        )}
+        images_list = _split_url_list(reference_images, 10)
+        videos_list = _split_url_list(reference_videos, 5)
+        audios_list = _split_url_list(reference_audios, 5)
+        if images_list:
+            payload["images_list"] = images_list
+        if videos_list:
+            payload["videos_list"] = videos_list
+        if audios_list:
+            payload["audios_list"] = audios_list
+        if not (images_list or videos_list or audios_list):
+            raise ValueError(
+                "Provide at least one reference image, video, or audio URL to the "
+                "Wan 3.0 Reference-to-Video node."
+            )
+        return self._complete(_load_api_key(api_key), payload)
 
 
 NODE_CLASS_MAPPINGS = {
@@ -543,6 +674,7 @@ NODE_CLASS_MAPPINGS = {
     "Wan30ImageEdit": Wan30ImageEdit,
     "Wan30TextToVideo": Wan30TextToVideo,
     "Wan30ImageToVideo": Wan30ImageToVideo,
+    "Wan30ReferenceToVideo": Wan30ReferenceToVideo,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -551,4 +683,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Wan30ImageEdit": "🖌️ Wan 3.0 Image Edit",
     "Wan30TextToVideo": "🎬 Wan 3.0 Text-to-Video",
     "Wan30ImageToVideo": "🎬 Wan 3.0 Image-to-Video",
+    "Wan30ReferenceToVideo": "🎬 Wan 3.0 Reference-to-Video",
 }
