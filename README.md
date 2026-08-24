@@ -15,6 +15,9 @@ The pack follows the focused Muapi workflow pattern: add one API Key node, conne
 - [seedance2-comfyui](https://github.com/Anil-matcha/seedance2-comfyui) — Seedance 2 custom nodes and workflows for ComfyUI.
 - [seedance2.5-comfyui](https://github.com/Anil-matcha/seedance2.5-comfyui) — Native Seedance 2.5 custom nodes and workflows for ComfyUI.
 - [veo3.1-comfyui](https://github.com/Anil-matcha/veo3.1-comfyui) — Veo 3.1 custom nodes and workflows for ComfyUI.
+- [FLUX 3 ComfyUI](https://github.com/Anil-matcha/flux-3-comfyui) — focused Muapi nodes for FLUX 3 image and video workflows.
+- [MiniMax H3 ComfyUI](https://github.com/Anil-matcha/minimax-h3-comfyui) — focused Muapi nodes for MiniMax H3 video workflows.
+- [Muapi API reference](https://muapi.ai/docs/api-reference) — shared authentication, polling, and upload behavior.
 
 ## Included nodes
 
@@ -101,12 +104,6 @@ For local testing against a compatible Muapi deployment, set `WAN_3_API_BASE_URL
 ## Requirements
 
 Python 3.8+, `requests`, `Pillow`, `numpy`, and `opencv-python`. ComfyUI supplies the installed PyTorch runtime used by `IMAGE` tensors. For in-ComfyUI video playback, install [ComfyUI-VideoHelperSuite](https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite).
-
-## Related Projects
-
-- [FLUX 3 ComfyUI](https://github.com/Anil-matcha/flux-3-comfyui) — focused Muapi nodes for FLUX 3 image and video workflows.
-- [MiniMax H3 ComfyUI](https://github.com/Anil-matcha/minimax-h3-comfyui) — focused Muapi nodes for MiniMax H3 video workflows.
-- [Muapi API reference](https://muapi.ai/docs/api-reference) — shared authentication, polling, and upload behavior.
 
 ## License
 
