@@ -10,6 +10,7 @@ The pack follows the focused Muapi workflow pattern: add one API Key node, conne
 ## Related Projects
 
 - [Wan-3.0-API](https://github.com/Anil-matcha/Wan-3.0-API) — Python SDK and MCP server for Wan 3.0-compatible video workflows.
+- [Wan-3.0-Prime-API](https://github.com/Anil-matcha/Wan-3.0-Prime-API) — Python SDK and MCP server for the higher-fidelity Wan 3.0 Prime tier.
 - [Open-Generative-AI](https://github.com/Anil-matcha/Open-Generative-AI) — Open-source media studio that uses MuAPI for image and video workflows.
 - [muapi-comfyui](https://github.com/SamurAIGPT/muapi-comfyui) — General MuAPI ComfyUI node pack.
 - [seedance2-comfyui](https://github.com/Anil-matcha/seedance2-comfyui) — Seedance 2 custom nodes and workflows for ComfyUI.
