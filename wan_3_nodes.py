@@ -668,6 +668,27 @@ class Wan30ReferenceToVideo(_Wan30GenerationNode):
         return self._complete(_load_api_key(api_key), payload)
 
 
+class Wan30SpicyTextToVideo(Wan30TextToVideo):
+    """Relaxed-moderation Wan 3.0 Spicy text-to-video endpoint."""
+
+    endpoint = "wan3.0-spicy-text-to-video"
+    label = "Wan 3.0 Spicy T2V"
+
+
+class Wan30SpicyImageToVideo(Wan30ImageToVideo):
+    """Relaxed-moderation Wan 3.0 Spicy image-to-video endpoint."""
+
+    endpoint = "wan3.0-spicy-image-to-video"
+    label = "Wan 3.0 Spicy I2V"
+
+
+class Wan30SpicyReferenceToVideo(Wan30ReferenceToVideo):
+    """Relaxed-moderation Wan 3.0 Spicy reference-to-video endpoint."""
+
+    endpoint = "wan3.0-spicy-reference-to-video"
+    label = "Wan 3.0 Spicy R2V"
+
+
 NODE_CLASS_MAPPINGS = {
     "Wan30ApiKey": Wan30ApiKey,
     "Wan30TextToImage": Wan30TextToImage,
@@ -675,6 +696,9 @@ NODE_CLASS_MAPPINGS = {
     "Wan30TextToVideo": Wan30TextToVideo,
     "Wan30ImageToVideo": Wan30ImageToVideo,
     "Wan30ReferenceToVideo": Wan30ReferenceToVideo,
+    "Wan30SpicyTextToVideo": Wan30SpicyTextToVideo,
+    "Wan30SpicyImageToVideo": Wan30SpicyImageToVideo,
+    "Wan30SpicyReferenceToVideo": Wan30SpicyReferenceToVideo,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -684,4 +708,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "Wan30TextToVideo": "🎬 Wan 3.0 Text-to-Video",
     "Wan30ImageToVideo": "🎬 Wan 3.0 Image-to-Video",
     "Wan30ReferenceToVideo": "🎬 Wan 3.0 Reference-to-Video",
+    "Wan30SpicyTextToVideo": "🌶️ Wan 3.0 Spicy Text-to-Video",
+    "Wan30SpicyImageToVideo": "🌶️ Wan 3.0 Spicy Image-to-Video",
+    "Wan30SpicyReferenceToVideo": "🌶️ Wan 3.0 Spicy Reference-to-Video",
 }

@@ -29,6 +29,9 @@ The pack follows the focused Muapi workflow pattern: add one API Key node, conne
 | Wan 3.0 Text-to-Video | Generates a video with synchronized audio from a text prompt (resolution, aspect ratio, duration, thinking mode, seed). |
 | Wan 3.0 Image-to-Video | Animates one source image with a motion prompt, with optional end-frame guidance and the same audio/thinking-mode/duration controls. |
 | Wan 3.0 Reference-to-Video | Generates a video guided by up to 10 reference images, 5 reference videos, and 5 reference audios. |
+| Wan 3.0 Spicy Text-to-Video | Generates a text-prompted video through the Wan 3.0 Spicy endpoint. |
+| Wan 3.0 Spicy Image-to-Video | Animates a source image through the Wan 3.0 Spicy endpoint, with optional end-frame guidance. |
+| Wan 3.0 Spicy Reference-to-Video | Generates a video from reference images, videos, and/or audio through the Wan 3.0 Spicy endpoint. |
 | Wan 3.0 Text-to-Image | Generates an image from a text prompt. **Coming soon** — registered but not yet live on Muapi. |
 | Wan 3.0 Image Edit | Applies an instruction prompt to a source image. **Coming soon** — registered but not yet live on Muapi. |
 | Wan 3.0 Save Image | Downloads an image URL to `ComfyUI/output` and returns an `IMAGE`. |
@@ -83,6 +86,10 @@ Connect **Load Image → IMAGE** to **🎬 Wan 3.0 Image-to-Video**, or provide 
 
 Add **🎬 Wan 3.0 Reference-to-Video** and list one or more reference URLs (newline- or comma-separated) in `reference_images` (up to 10), `reference_videos` (up to 5), and/or `reference_audios` (up to 5). Reference media are identified by their order within each field, so the prompt can refer to "the first reference image" or similar.
 
+### Wan 3.0 Spicy
+
+Use the 🌶️ nodes for the relaxed-moderation Spicy tier. They accept the same controls and reference inputs as the standard video nodes, and submit to `wan3.0-spicy-text-to-video`, `wan3.0-spicy-image-to-video`, or `wan3.0-spicy-reference-to-video`. Spicy means reduced automated content-safety filtering; generated content must still comply with MuAPI and provider terms and applicable law.
+
 ### Text-to-image / Image edit (coming soon)
 
 **🖼️ Wan 3.0 Text-to-Image** and **🖌️ Wan 3.0 Image Edit** are included for when Muapi ships these endpoints, but calls to them currently fail — the underlying Wan 3.0 image models are not yet live.
@@ -94,6 +101,9 @@ Add **🎬 Wan 3.0 Reference-to-Video** and list one or more reference URLs (new
 | Text-to-video | `POST /api/v1/wan3.0-text-to-video` | `prompt`, `resolution`, `aspect_ratio`, `duration`, `thinking_mode`, `enable_audio`, `seed` |
 | Image-to-video | `POST /api/v1/wan3.0-image-to-video` | `prompt`, `image_url`, `last_image` (optional), plus the same video params |
 | Reference-to-video | `POST /api/v1/wan3.0-reference-to-video` | `prompt`, `images_list` (≤10), `videos_list` (≤5), `audios_list` (≤5), plus the same video params |
+| Spicy text-to-video | `POST /api/v1/wan3.0-spicy-text-to-video` | Same fields as standard text-to-video |
+| Spicy image-to-video | `POST /api/v1/wan3.0-spicy-image-to-video` | Same fields as standard image-to-video |
+| Spicy reference-to-video | `POST /api/v1/wan3.0-spicy-reference-to-video` | Same fields as standard reference-to-video |
 | Text-to-image *(coming soon)* | `POST /api/v1/wan3.0-text-to-image` | `prompt` |
 | Image edit *(coming soon)* | `POST /api/v1/wan3.0-image-edit` | `prompt`, `image_url` |
 | Poll task | `GET /api/v1/predictions/{request_id}/result` | — |
